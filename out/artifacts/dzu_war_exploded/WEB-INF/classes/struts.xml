@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+	"http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<constant name="struts.devMode" value="true" />
+	<constant name="struts.custom.i18n.resources" value="uploadFile"/>
+	<constant name="struts.i18n.encoding" value="UTF-8"/>
+	<constant name="struts.objectFactory" value="spring" />
+
+	<package name="xwl-default" namespace="/" extends="struts-default">
+		<!-- =========================== 定义全局变量============================= -->
+		<global-results>
+			<result name="quit">
+				 /error.jsp
+			</result>
+			<result name="error">
+				/nopower.jsp
+			</result>
+			<result name="unhandledException">
+			    /nofound.jsp
+			</result>
+		</global-results>
+		<global-exception-mappings>
+			<exception-mapping exception="java.lang.Exception"
+				result="unhandledException" />
+		</global-exception-mappings>
+	</package>
+	<package name="default" namespace="/" extends="xwl-default">
+		<!-- ===========================定义拦截器==================== -->
+		<interceptors>
+			<interceptor name="authority"
+				class="com.dzu.interceptor.CheckLoginInterceptor">
+			</interceptor>
+			<interceptor-stack name="mydefault">
+				<interceptor-ref name="defaultStack" />
+				<interceptor-ref name="authority" />
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="mydefault" />
+		<!-- ===========================登录=============================== -->
+		<action name="Login_*" class="login" method="{1}">
+			<result name="quit">
+				/index.jsp
+			</result>
+			<result name="success">
+				/WEB-INF/view/index.jsp
+			</result>
+		</action>
+		<!-- =================通知公告====================================== -->
+		<action name="Notice_*" class="notice" method="{1}">
+			<result name="success">
+				${geturl}
+			</result>
+		</action>
+		<!-- =================人员信息====================================== -->
+		<action name="Person_*" class="personinfo" method="{1}">
+			<result name="success">
+				${geturl}
+			</result>
+		</action>
+		<!-- =================人员上报====================================== -->
+		<action name="PersonSB_*" class="personsbinfo" method="{1}">
+			<result name="success">
+				${geturl}
+			</result>
+			<result name="downloadexport" type="stream">
+				<!-- 指定下载文件的内容类型，text/plain是默认类型 -->
+				<param name="contentType">text/plain</param>
+				<!-- inputName默认值是inputStream，如果action中用于读取下载文件内容的属性名是inputStream，那么可以省略这个参数 -->
+				<param name="inputName">inputStreams</param>
+				<!--动态获取文件名，从Action中的取得filename -->
+				<param name="contentDisposition">
+					attachment;filename="${file_name}"
+				</param>
+				<param name="bufferSize">2048</param>
+			</result>
+		</action>
+		<!-- =================统计分析====================================== -->
+		<action name="St_*" class="statistices" method="{1}">
+			<result name="success">
+				${geturl}
+			</result>
+		</action>
+		<!-- =================报表导出===================================== -->
+		<action name="Info_*" class="info" method="{1}">
+			<result name="success">
+				${geturl}
+			</result>
+		</action>
+		<!-- ==============系统管理================================ -->
+		<action name="Sym_*" method="{1}" class="sym">
+			<result name="roleManage">
+				/WEB-INF/view/sym/roleManage/roleManage.jsp
+			</result>
+			<result name="success">
+				${geturl}
+			</result>
+		</action>
+	</package>
+</struts>
